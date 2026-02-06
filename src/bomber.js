@@ -19,6 +19,15 @@ export const createBomber = async () => {
 
   const bomberGroup = gltf.scene
 
+  // Debug: Find model bounds
+  const box = new THREE.Box3().setFromObject(bomberGroup)
+  const center = box.getCenter(new THREE.Vector3())
+  const size = box.getSize(new THREE.Vector3())
+  console.log('Model center:', center)
+  console.log('Model size:', size)
+  console.log('Model bounds min:', box.min)
+  console.log('Model bounds max:', box.max)
+
   // Store original materials for manipulation
   const materials = []
 
@@ -37,23 +46,32 @@ export const createBomber = async () => {
     }
   })
 
-  // Add engine glow points (approximate positions for B2)
-  const enginePositions = [
-    { x: -2, y: 0, z: -2 },
-    { x: -0.7, y: 0, z: -2 },
-    { x: 0.7, y: 0, z: -2 },
-    { x: 2, y: 0, z: -2 }
+  // B2 has two exhaust vents near center (chevron shaped)
+  // Model center is offset ~0.8 to the right in world space
+  const exhaustPositions = [
+    { x: 0.1, y: 0.3, z: 3.5 },   // Left exhaust
+    { x: 1.5, y: 0.3, z: 3.5 }    // Right exhaust
   ]
 
   const engines = []
+  const jetStreams = new THREE.Group()
 
-  enginePositions.forEach(pos => {
-    // Create point light for engine glow
-    const engineLight = new THREE.PointLight(0xff6600, 0, 5)
-    engineLight.position.set(pos.x, pos.y, pos.z)
-    bomberGroup.add(engineLight)
+  exhaustPositions.forEach(pos => {
+    // Simple glowing plane for exhaust
+    const glowGeo = new THREE.PlaneGeometry(0.8, 0.4)
+    const glowMat = new THREE.MeshBasicMaterial({
+      color: 0xff4400,
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide
+    })
+    const glow = new THREE.Mesh(glowGeo, glowMat)
 
-    engines.push({ light: engineLight })
+    glow.position.set(pos.x, pos.y, pos.z)
+    glow.rotation.x = -Math.PI / 2.5  // Tilt to match exhaust angle
+
+    jetStreams.add(glow)
+    engines.push({ glow, material: glowMat })
   })
 
   // Scale and orient the bomber
@@ -62,6 +80,7 @@ export const createBomber = async () => {
 
   return {
     group: bomberGroup,
+    jetStreams,
     materials,
     engines,
 
@@ -69,11 +88,12 @@ export const createBomber = async () => {
     update: (throttle) => {
       // throttle is 0-1
 
-      // Update engine glow based on throttle
-      engines.forEach(({ light }) => {
-        // Orange thruster glow
-        light.intensity = throttle * 2.0
-        light.distance = 5 + throttle * 5
+      // Update exhaust glow based on throttle
+      engines.forEach(({ glow, material }) => {
+        material.opacity = throttle * 0.95
+        // Subtle scale increase with throttle
+        const scale = 1 + throttle * 0.5
+        glow.scale.set(scale, scale, 1)
       })
 
       // Update bomber materials as throttle increases

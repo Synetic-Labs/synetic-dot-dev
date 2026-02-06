@@ -1,16 +1,31 @@
 import { createScene } from './scene.js'
+import { InputManager } from './input.js'
 
 const init = async () => {
   try {
     // Initialize scene
-    const { scene, camera, renderer } = await createScene()
+    const { scene, camera, renderer, bomber } = await createScene()
+
+    // Initialize input
+    const input = new InputManager()
 
     // Append canvas to body
     document.body.appendChild(renderer.domElement)
 
-    // Animation loop
+    // Animation loop with delta time
+    let lastTime = performance.now()
+
     const animate = () => {
       requestAnimationFrame(animate)
+
+      const now = performance.now()
+      const deltaTime = (now - lastTime) / 1000
+      lastTime = now
+
+      // Update input and bomber
+      input.update(deltaTime)
+      bomber.update(input.getThrottle())
+
       renderer.render(scene, camera)
     }
 
