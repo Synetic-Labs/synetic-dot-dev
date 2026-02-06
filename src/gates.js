@@ -64,6 +64,7 @@ export const createGateSystem = () => {
   let spawnTimer = 0
   let active = false
   let stopped = false
+  let score = 0
 
   const spawnGate = () => {
     const gate = pool.find(g => !g.active)
@@ -159,7 +160,7 @@ export const createGateSystem = () => {
         const cleanPass = dx < innerHalf && dy < innerHalf
 
         if (cleanPass) {
-          console.count('Gates')
+          score++
           // Success - dissolve effect
           gate.dissolving = true
           gate.dissolveTimer = 0
@@ -186,5 +187,7 @@ export const createGateSystem = () => {
 
   const stop = () => { stopped = true }
 
-  return { group, update, getFlashIntensity, stop }
+  const getScore = () => score
+
+  return { group, update, getFlashIntensity, stop, getScore }
 }

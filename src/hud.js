@@ -62,5 +62,14 @@ export const createHUD = () => {
     return false
   }
 
-  return { update, onMiss }
+  const showScore = (score) => {
+    horizon.style.transform = 'translate(-50%, -50%)'
+    dots.forEach(d => d.remove())
+    const el = document.createElement('div')
+    el.textContent = score
+    el.style.cssText = `color:${DOT_COLOR};font-family:monospace;font-size:1.2rem;white-space:nowrap`
+    horizon.appendChild(el)
+  }
+
+  return { update, onMiss, showScore }
 }

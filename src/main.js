@@ -78,6 +78,7 @@ const init = async () => {
           dead = true
           lastThrottle = throttle
           gates.stop()
+          hud.showScore(gates.getScore())
         }
       }
       wasFlashing = isFlashing
