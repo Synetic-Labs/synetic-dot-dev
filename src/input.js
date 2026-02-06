@@ -23,8 +23,6 @@ export class InputManager {
     this.mouseActive = false
 
     this.keys = {
-      throttleUp: false,
-      throttleDown: false,
       pitchUp: false,
       pitchDown: false,
       rollLeft: false,
@@ -39,35 +37,25 @@ export class InputManager {
   setupKeyboard() {
     window.addEventListener('keydown', (e) => {
       switch (e.code) {
-        // Throttle
+        // Pitch (W/S, arrow up/down)
         case 'KeyW':
-        case 'Space':
-          this.keys.throttleUp = true
-          e.preventDefault()
-          break
-        case 'KeyS':
-        case 'ShiftLeft':
-        case 'ShiftRight':
-          this.keys.throttleDown = true
-          e.preventDefault()
-          break
-        // Pitch (arrow up/down)
         case 'ArrowUp':
           this.keys.pitchUp = true
           e.preventDefault()
           break
+        case 'KeyS':
         case 'ArrowDown':
           this.keys.pitchDown = true
           e.preventDefault()
           break
-        // Roll (arrow left/right, A/D)
-        case 'ArrowLeft':
+        // Roll (A/D, arrow left/right)
         case 'KeyA':
+        case 'ArrowLeft':
           this.keys.rollLeft = true
           e.preventDefault()
           break
-        case 'ArrowRight':
         case 'KeyD':
+        case 'ArrowRight':
           this.keys.rollRight = true
           e.preventDefault()
           break
@@ -76,30 +64,22 @@ export class InputManager {
 
     window.addEventListener('keyup', (e) => {
       switch (e.code) {
-        // Throttle
-        case 'KeyW':
-        case 'Space':
-          this.keys.throttleUp = false
-          break
-        case 'KeyS':
-        case 'ShiftLeft':
-        case 'ShiftRight':
-          this.keys.throttleDown = false
-          break
         // Pitch
+        case 'KeyW':
         case 'ArrowUp':
           this.keys.pitchUp = false
           break
+        case 'KeyS':
         case 'ArrowDown':
           this.keys.pitchDown = false
           break
         // Roll
-        case 'ArrowLeft':
         case 'KeyA':
+        case 'ArrowLeft':
           this.keys.rollLeft = false
           break
-        case 'ArrowRight':
         case 'KeyD':
+        case 'ArrowRight':
           this.keys.rollRight = false
           break
       }
@@ -141,15 +121,6 @@ export class InputManager {
   }
 
   update(deltaTime) {
-    // --- Throttle ---
-    // Keyboard throttle
-    if (this.keys.throttleUp) {
-      this.targetThrottle = Math.min(1, this.targetThrottle + deltaTime * 0.5)
-    }
-    if (this.keys.throttleDown) {
-      this.targetThrottle = Math.max(0, this.targetThrottle - deltaTime * 0.5)
-    }
-
     // --- Pitch/Roll from keyboard ---
     // Keyboard sets target directly (binary input)
     let keyboardPitch = 0
