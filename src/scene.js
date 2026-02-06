@@ -41,7 +41,6 @@ export const createScene = async () => {
   const bomber = await createBomber()
   bomber.group.position.set(0, 0, 0)
   scene.add(bomber.group)
-  scene.add(bomber.jetStreams)
 
   // Handle window resize
   const handleResize = () => {

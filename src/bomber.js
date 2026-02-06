@@ -35,19 +35,20 @@ export const createBomber = async () => {
   })
 
   // B2 has two exhaust vents near center (chevron shaped)
-  // Model center is offset ~0.8 to the right in world space
-  // Exhausts centered around x=0.8, spaced ~0.7 apart each side
+  // Convert original world positions to local space:
+  // local = -world / scale (due to 180° Y rotation and 2x scale)
+  // Original world: (0.1, 0.3, 3.5) and (1.6, 0.3, 3.5)
   const exhaustPositions = [
-    { x: 0.1, y: 0.3, z: 3.5 },   // Left exhaust
-    { x: 1.6, y: 0.3, z: 3.5 }    // Right exhaust
+    { x: -0.05, y: 0.3, z: -2.00 },   // Left exhaust
+    { x: -0.8, y: 0.3, z: -2.00 }     // Right exhaust
   ]
 
   const engines = []
   const jetStreams = new THREE.Group()
 
   exhaustPositions.forEach(pos => {
-    // Simple glowing plane for exhaust
-    const glowGeo = new THREE.PlaneGeometry(0.8, 0.4)
+    // Simple glowing plane for exhaust (halved since parent scales 2x)
+    const glowGeo = new THREE.PlaneGeometry(0.4, 0.2)
     const glowMat = new THREE.MeshBasicMaterial({
       color: 0xff4400,
       transparent: true,
@@ -62,6 +63,9 @@ export const createBomber = async () => {
     jetStreams.add(glow)
     engines.push({ glow, material: glowMat })
   })
+
+  // Add jet streams as child of bomber so they move together
+  bomberGroup.add(jetStreams)
 
   // Scale and orient the bomber
   bomberGroup.scale.setScalar(2)
@@ -122,11 +126,6 @@ export const createBomber = async () => {
       const targetLateral = roll * maxLateralOffset
       currentLateral += (targetLateral - currentLateral) * dampingFactor
       bomberGroup.position.x = currentLateral
-
-      // Sync jet streams position with bomber
-      jetStreams.position.x = currentLateral
-      jetStreams.rotation.x = currentPitch
-      jetStreams.rotation.z = currentRoll
     }
   }
 }
