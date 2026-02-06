@@ -4,13 +4,18 @@ import { InputManager } from './input.js'
 const init = async () => {
   try {
     // Initialize scene
-    const { scene, camera, renderer, bomber } = await createScene()
+    const { scene, camera, renderer, bomber, gates } = await createScene()
 
     // Initialize input
     const input = new InputManager()
 
     // Append canvas to body
     document.body.appendChild(renderer.domElement)
+
+    // Red flash overlay for missed gates
+    const flashOverlay = document.createElement('div')
+    flashOverlay.style.cssText = 'position:fixed;inset:0;background:#ff2222;pointer-events:none;opacity:0;z-index:10'
+    document.body.appendChild(flashOverlay)
 
     // Animation loop with delta time
     let lastTime = performance.now()
@@ -28,6 +33,11 @@ const init = async () => {
       const pitch = input.getPitch()
       const roll = input.getRoll()
       bomber.update(throttle, pitch, roll)
+      gates.update(deltaTime, throttle, bomber.group.position.x, bomber.group.position.y)
+
+      // Screen flash on miss
+      const flash = gates.getFlashIntensity()
+      flashOverlay.style.opacity = flash * 0.4
 
       renderer.render(scene, camera)
     }

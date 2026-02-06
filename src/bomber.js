@@ -75,11 +75,13 @@ export const createBomber = async () => {
   const maxPitchAngle = Math.PI / 6   // 30 degrees
   const maxRollAngle = Math.PI / 4    // 45 degrees
   const maxLateralOffset = 8          // Max horizontal drift
+  const maxVerticalOffset = 5         // Max vertical drift
 
   // Store current visual state for smooth transitions
   let currentPitch = 0
   let currentRoll = 0
   let currentLateral = 0
+  let currentVertical = 0
 
   return {
     group: bomberGroup,
@@ -126,6 +128,11 @@ export const createBomber = async () => {
       const targetLateral = roll * maxLateralOffset
       currentLateral += (targetLateral - currentLateral) * dampingFactor
       bomberGroup.position.x = currentLateral
+
+      // Vertical movement based on pitch (nose up = climb)
+      const targetVertical = -pitch * maxVerticalOffset
+      currentVertical += (targetVertical - currentVertical) * dampingFactor
+      bomberGroup.position.y = currentVertical
     }
   }
 }

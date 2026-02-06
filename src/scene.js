@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import WebGPURenderer from 'three/src/renderers/webgpu/WebGPURenderer.js'
 import { createBomber } from './bomber.js'
+import { createGateSystem } from './gates.js'
 
 export const createScene = async () => {
   // Scene setup
@@ -28,19 +29,14 @@ export const createScene = async () => {
   // Initialize WebGPU
   await renderer.init()
 
-  // Minimal lighting
-  const ambientLight = new THREE.AmbientLight(0x1a1a2e, 0.2) // Very subtle ambient
-  scene.add(ambientLight)
-
-  // Subtle directional light
-  const directionalLight = new THREE.DirectionalLight(0x3a3a5a, 0.3)
-  directionalLight.position.set(10, 10, 5)
-  scene.add(directionalLight)
-
   // Create and add B2 Spirit bomber
   const bomber = await createBomber()
   bomber.group.position.set(0, 0, 0)
   scene.add(bomber.group)
+
+  // Create gate system
+  const gates = createGateSystem()
+  scene.add(gates.group)
 
   // Handle window resize
   const handleResize = () => {
@@ -55,6 +51,7 @@ export const createScene = async () => {
     camera,
     renderer,
     bomber,
+    gates,
     cleanup: () => {
       window.removeEventListener('resize', handleResize)
       renderer.dispose()
