@@ -159,6 +159,7 @@ export const createGateSystem = () => {
         const cleanPass = dx < innerHalf && dy < innerHalf
 
         if (cleanPass) {
+          console.count('Gates')
           // Success - dissolve effect
           gate.dissolving = true
           gate.dissolveTimer = 0

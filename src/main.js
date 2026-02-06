@@ -87,13 +87,11 @@ const init = async () => {
     }
 
     animate()
-
-    console.log('Stealth Flight initialized with WebGPU')
   } catch (error) {
     console.error('Failed to initialize:', error)
     document.body.innerHTML = `
       <div style="color: #ff2222; padding: 20px; font-family: monospace;">
-        WebGPU initialization failed. Please use a browser that supports WebGPU.
+        Initialization failed. Your browser may not support the required graphics features.
       </div>
     `
   }

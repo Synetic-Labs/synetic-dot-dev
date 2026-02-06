@@ -1,6 +1,6 @@
 /**
  * Input handling for flight controls
- * Supports keyboard, mouse, and gamepad
+ * Supports keyboard, mouse, gamepad, gyroscope, and touch
  */
 
 export class InputManager {
@@ -22,6 +22,17 @@ export class InputManager {
     this.mouseY = 0
     this.mouseActive = false
 
+    // Gyroscope state (activates on first deviceorientation event)
+    this.gyroActive = false
+    this.gyroPitch = 0
+    this.gyroRoll = 0
+    this.gyroBaselineBeta = null
+    this.gyroBaselineGamma = null
+
+    // Touch state
+    this.touchStartY = null
+    this.touchCurrentY = null
+
     this.keys = {
       pitchUp: false,
       pitchDown: false,
@@ -32,6 +43,8 @@ export class InputManager {
     this.setupKeyboard()
     this.setupMouseWheel()
     this.setupMouseMovement()
+    this.setupGyroscope()
+    this.setupTouch()
   }
 
   setupKeyboard() {
@@ -120,7 +133,78 @@ export class InputManager {
     })
   }
 
+  setupGyroscope() {
+    // Request permission on iOS (requires user gesture)
+    const requestPermission = () => {
+      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+          .then(state => {
+            if (state === 'granted') this.bindGyroscope()
+          })
+          .catch(() => {})
+      }
+    }
+
+    // On iOS, permission must be requested from a user gesture
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      window.addEventListener('touchstart', requestPermission, { once: true })
+    } else {
+      // Android/desktop: bind directly (on desktop, event simply never fires)
+      this.bindGyroscope()
+    }
+  }
+
+  bindGyroscope() {
+    window.addEventListener('deviceorientation', (e) => {
+      if (e.beta === null || e.gamma === null) return
+
+      // Set baseline on first reading (calibration)
+      if (this.gyroBaselineBeta === null) {
+        this.gyroBaselineBeta = e.beta
+        this.gyroBaselineGamma = e.gamma
+      }
+
+      this.gyroActive = true
+
+      // Offset from baseline, normalized to -1…1 (±30° = full deflection)
+      const maxAngle = 30
+      const pitchDeg = e.beta - this.gyroBaselineBeta
+      const rollDeg = e.gamma - this.gyroBaselineGamma
+
+      this.gyroPitch = Math.max(-1, Math.min(1, pitchDeg / maxAngle))
+      this.gyroRoll = Math.max(-1, Math.min(1, rollDeg / maxAngle))
+    })
+  }
+
+  setupTouch() {
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return
+      this.touchStartY = e.touches[0].clientY
+      this.touchCurrentY = e.touches[0].clientY
+      e.preventDefault()
+    }, { passive: false })
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length !== 1) return
+      this.touchCurrentY = e.touches[0].clientY
+      e.preventDefault()
+    }, { passive: false })
+
+    window.addEventListener('touchend', () => {
+      this.touchStartY = null
+      this.touchCurrentY = null
+    })
+  }
+
   update(deltaTime) {
+    // --- Touch throttle (swipe up = increase, swipe down = decrease) ---
+    if (this.touchStartY !== null && this.touchCurrentY !== null) {
+      const deltaY = this.touchStartY - this.touchCurrentY  // Positive = swiped up
+      const sensitivity = 0.003
+      this.targetThrottle = Math.max(0, Math.min(1, this.targetThrottle + deltaY * sensitivity))
+      this.touchStartY = this.touchCurrentY  // Reset for incremental deltas
+    }
+
     // --- Pitch/Roll from keyboard ---
     // Keyboard sets target directly (binary input)
     let keyboardPitch = 0
@@ -161,14 +245,16 @@ export class InputManager {
       }
     }
 
-    // --- Combine inputs (priority: gamepad > keyboard > mouse) ---
-    // Use the most significant input for each axis
+    // --- Combine inputs (priority: gamepad > keyboard > gyroscope > mouse) ---
     if (Math.abs(gamepadPitch) > 0.1 || Math.abs(gamepadRoll) > 0.1) {
       this.targetPitch = gamepadPitch
       this.targetRoll = gamepadRoll
     } else if (keyboardPitch !== 0 || keyboardRoll !== 0) {
       this.targetPitch = keyboardPitch
       this.targetRoll = keyboardRoll
+    } else if (this.gyroActive) {
+      this.targetPitch = this.gyroPitch * 0.7
+      this.targetRoll = this.gyroRoll * 0.7
     } else if (this.mouseActive) {
       // Mouse: Y controls pitch, X controls roll
       this.targetPitch = this.mouseY * 0.7  // Reduced sensitivity

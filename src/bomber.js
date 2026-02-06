@@ -77,6 +77,11 @@ export const createBomber = async () => {
   const maxLateralOffset = 8          // Max horizontal drift
   const maxVerticalOffset = 5         // Max vertical drift
 
+  // Pre-allocated colors (avoid per-frame allocation)
+  const idleColor = new THREE.Color(0x121212)
+  const activeColor = new THREE.Color(0x080808)
+  const scratchColor = new THREE.Color()
+
   // Store current visual state for smooth transitions
   let currentPitch = 0
   let currentRoll = 0
@@ -107,12 +112,10 @@ export const createBomber = async () => {
       // Update bomber color based on throttle
       // Idle: #121212 (matches background, invisible)
       // Active: #080808 (darker, visible silhouette)
-      const idleColor = new THREE.Color(0x121212)
-      const activeColor = new THREE.Color(0x080808)
-      const currentColor = idleColor.clone().lerp(activeColor, throttle)
+      scratchColor.copy(idleColor).lerp(activeColor, throttle)
 
       meshes.forEach((mesh) => {
-        mesh.material.color.copy(currentColor)
+        mesh.material.color.copy(scratchColor)
       })
 
       // Apply pitch and roll rotations (heavily damped)

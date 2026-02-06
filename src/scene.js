@@ -26,8 +26,9 @@ export const createScene = async () => {
   renderer.setSize(window.innerWidth, window.innerHeight)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-  // Initialize WebGPU
+  // Initialize WebGPU (auto-falls back to WebGL2 if unavailable)
   await renderer.init()
+
 
   // Create and add B2 Spirit bomber
   const bomber = await createBomber()
