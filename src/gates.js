@@ -63,6 +63,7 @@ export const createGateSystem = () => {
 
   let spawnTimer = 0
   let active = false
+  let stopped = false
 
   const spawnGate = () => {
     const gate = pool.find(g => !g.active)
@@ -110,11 +111,13 @@ export const createGateSystem = () => {
       spawnTimer = BASE_INTERVAL * 0.6
     }
 
-    // Spawn timer (faster at higher throttle)
-    spawnTimer += deltaTime
-    if (spawnTimer >= BASE_INTERVAL / Math.max(throttle, 0.1)) {
-      spawnGate()
-      spawnTimer = 0
+    // Spawn timer (faster at higher throttle) - skip if stopped
+    if (!stopped) {
+      spawnTimer += deltaTime
+      if (spawnTimer >= BASE_INTERVAL / Math.max(throttle, 0.1)) {
+        spawnGate()
+        spawnTimer = 0
+      }
     }
 
     // Move and check all active gates
@@ -180,5 +183,7 @@ export const createGateSystem = () => {
 
   const getFlashIntensity = () => flashTimer / FLASH_DURATION
 
-  return { group, update, getFlashIntensity }
+  const stop = () => { stopped = true }
+
+  return { group, update, getFlashIntensity, stop }
 }

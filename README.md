@@ -69,11 +69,11 @@ The experience is subtle, atmospheric, and elegant—an easter egg background th
 - [x] Keyboard, mouse, gamepad support
 
 ### Phase 4: Approaching Gates
-- [ ] Square gate geometry
-- [ ] Red emissive material
-- [ ] Spawning and approach system
-- [ ] Collision detection
-- [ ] Randomized positioning
+- [x] Square gate geometry
+- [x] Red emissive material
+- [x] Spawning and approach system
+- [x] Collision detection
+- [x] Randomized positioning
 
 ### Phase 5: Polish & Mobile
 - [ ] Performance optimization
