@@ -24,7 +24,10 @@ const init = async () => {
 
       // Update input and bomber
       input.update(deltaTime)
-      bomber.update(input.getThrottle())
+      const throttle = input.getThrottle()
+      const pitch = input.getPitch()
+      const roll = input.getRoll()
+      bomber.update(throttle, pitch, roll)
 
       renderer.render(scene, camera)
     }

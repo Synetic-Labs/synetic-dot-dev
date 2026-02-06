@@ -19,38 +19,27 @@ export const createBomber = async () => {
 
   const bomberGroup = gltf.scene
 
-  // Debug: Find model bounds
-  const box = new THREE.Box3().setFromObject(bomberGroup)
-  const center = box.getCenter(new THREE.Vector3())
-  const size = box.getSize(new THREE.Vector3())
-  console.log('Model center:', center)
-  console.log('Model size:', size)
-  console.log('Model bounds min:', box.min)
-  console.log('Model bounds max:', box.max)
+  // Store meshes for material manipulation
+  const meshes = []
 
-  // Store original materials for manipulation
-  const materials = []
-
-  // Apply dark material for inactive state
+  // Replace GLTF materials with simple MeshBasicMaterial for reliable color control
   bomberGroup.traverse((child) => {
     if (child.isMesh) {
-      // Store reference to material
-      materials.push(child.material)
-
-      // Set initial dark appearance
-      child.material.color = new THREE.Color(0x0f0f0f)
-      child.material.metalness = 0.3
-      child.material.roughness = 0.7
-      child.material.emissive = new THREE.Color(0x000000)
-      child.material.emissiveIntensity = 0
+      // Create new simple material
+      const newMaterial = new THREE.MeshBasicMaterial({
+        color: 0x121212  // Match background - invisible at idle
+      })
+      child.material = newMaterial
+      meshes.push(child)
     }
   })
 
   // B2 has two exhaust vents near center (chevron shaped)
   // Model center is offset ~0.8 to the right in world space
+  // Exhausts centered around x=0.8, spaced ~0.7 apart each side
   const exhaustPositions = [
     { x: 0.1, y: 0.3, z: 3.5 },   // Left exhaust
-    { x: 1.5, y: 0.3, z: 3.5 }    // Right exhaust
+    { x: 1.6, y: 0.3, z: 3.5 }    // Right exhaust
   ]
 
   const engines = []
@@ -76,18 +65,31 @@ export const createBomber = async () => {
 
   // Scale and orient the bomber
   bomberGroup.scale.setScalar(2)
-  bomberGroup.rotation.y = Math.PI // Face forward
+  bomberGroup.rotation.y = Math.PI // Face forward (base rotation)
+
+  // Flight control limits
+  const maxPitchAngle = Math.PI / 6   // 30 degrees
+  const maxRollAngle = Math.PI / 4    // 45 degrees
+  const maxLateralOffset = 8          // Max horizontal drift
+
+  // Store current visual state for smooth transitions
+  let currentPitch = 0
+  let currentRoll = 0
+  let currentLateral = 0
 
   return {
     group: bomberGroup,
     jetStreams,
-    materials,
+    meshes,
     engines,
 
-    // Update function to control throttle effects
-    update: (throttle) => {
-      // throttle is 0-1
-
+    /**
+     * Update bomber visuals and position
+     * @param {number} throttle - 0 to 1
+     * @param {number} pitch - -1 to 1 (negative = nose up)
+     * @param {number} roll - -1 to 1 (negative = bank left)
+     */
+    update: (throttle, pitch = 0, roll = 0) => {
       // Update exhaust glow based on throttle
       engines.forEach(({ glow, material }) => {
         material.opacity = throttle * 0.95
@@ -96,20 +98,35 @@ export const createBomber = async () => {
         glow.scale.set(scale, scale, 1)
       })
 
-      // Update bomber materials as throttle increases
-      materials.forEach((material) => {
-        if (throttle > 0) {
-          // Reveal the bomber form
-          material.color.setHex(0x1f1f1f)
-          material.emissive = new THREE.Color(0x3a3a5a)
-          material.emissiveIntensity = throttle * 0.15
-        } else {
-          // Inactive state
-          material.color.setHex(0x0f0f0f)
-          material.emissive = new THREE.Color(0x000000)
-          material.emissiveIntensity = 0
-        }
+      // Update bomber color based on throttle
+      // Idle: #121212 (matches background, invisible)
+      // Active: #080808 (darker, visible silhouette)
+      const idleColor = new THREE.Color(0x121212)
+      const activeColor = new THREE.Color(0x080808)
+      const currentColor = idleColor.clone().lerp(activeColor, throttle)
+
+      meshes.forEach((mesh) => {
+        mesh.material.color.copy(currentColor)
       })
+
+      // Apply pitch and roll rotations (heavily damped)
+      const dampingFactor = 0.08
+      currentPitch += (pitch * maxPitchAngle - currentPitch) * dampingFactor
+      currentRoll += (roll * maxRollAngle - currentRoll) * dampingFactor
+
+      // Apply rotations (base Y rotation + pitch/roll)
+      bomberGroup.rotation.x = currentPitch
+      bomberGroup.rotation.z = currentRoll
+
+      // Lateral movement based on roll (drift in direction of bank)
+      const targetLateral = roll * maxLateralOffset
+      currentLateral += (targetLateral - currentLateral) * dampingFactor
+      bomberGroup.position.x = currentLateral
+
+      // Sync jet streams position with bomber
+      jetStreams.position.x = currentLateral
+      jetStreams.rotation.x = currentPitch
+      jetStreams.rotation.z = currentRoll
     }
   }
 }

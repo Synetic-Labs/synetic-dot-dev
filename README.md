@@ -48,25 +48,25 @@ The experience is subtle, atmospheric, and elegant—an easter egg background th
 ## Development Plan
 
 ### Phase 1: Dark Foundation
-- [ ] Minimal HTML structure
-- [ ] THREE.js WebGPU renderer initialization
-- [ ] Dark scene with minimal lighting
-- [ ] WebGPU compatibility check
+- [x] Minimal HTML structure
+- [x] THREE.js WebGPU renderer initialization
+- [x] Dark scene with minimal lighting
+- [x] WebGPU compatibility check
 
 ### Phase 2: Stealth Bomber
-- [ ] Low-poly B2 Spirit geometry
-- [ ] Inactive silhouette state
-- [ ] Thruster glow system
-- [ ] Throttle-to-activate mechanism
-- [ ] Progressive reveal animation
-- [ ] Camera positioning
+- [x] Low-poly B2 Spirit geometry
+- [x] Inactive silhouette state
+- [x] Thruster glow system
+- [x] Throttle-to-activate mechanism
+- [x] Progressive reveal animation
+- [x] Camera positioning
 
 ### Phase 3: Flight Controls
-- [ ] Pitch and roll mechanics
-- [ ] Lateral movement
-- [ ] Throttle control
-- [ ] Smooth, damped control feel
-- [ ] Keyboard, mouse, gamepad support
+- [x] Pitch and roll mechanics
+- [x] Lateral movement
+- [x] Throttle control
+- [x] Smooth, damped control feel
+- [x] Keyboard, mouse, gamepad support
 
 ### Phase 4: Approaching Gates
 - [ ] Square gate geometry
