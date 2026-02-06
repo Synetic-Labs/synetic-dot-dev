@@ -79,7 +79,7 @@ The experience is subtle, atmospheric, and elegant—an easter egg background th
 - [x] Performance optimization
 - [x] WebGPU fallback (WebGL)
 - [x] Mobile gyroscope controls
-- [ ] Website title element
+- [x] Website title element
 
 ## Design Philosophy
 
