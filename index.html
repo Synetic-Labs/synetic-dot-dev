@@ -1,54 +1,117 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>synetic labs</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-            background: #121212;
-            touch-action: none;
-        }
-
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        h1 {
-            position: fixed;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ececec;
-            font-family: monospace;
-            font-size: 1.8rem;
-            pointer-events: none;
-            z-index: 5;
-            text-wrap: nowrap;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Synetic Labs</title>
+<meta name="description" content="Synetic Labs - machine intelligence research and development">
+<link rel="canonical" href="https://synetic.dev/">
 </head>
 <body>
-    <h1>synetic labs</h1>
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js",
-                "three/": "https://cdn.jsdelivr.net/npm/three@0.182.0/"
-            }
-        }
-    </script>
-    <script type="module" src="./src/main.js"></script>
+
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr><td></td><td width="720">
+
+<center>
+<h1>Synetic Labs</h1>
+<p>Drone simulation ・ Flight firmware ・ Autonomous racing</p>
+<p>
+[ <a href="#projects" accesskey="p">Projects</a> ]
+[ <a href="#updates" accesskey="u">Updates</a> ]
+[ <a href="#racing" accesskey="r">Racing</a> ]
+[ <a href="#contact" accesskey="c">Contact</a> ]
+</p>
+</center>
+
+<hr noshade size="1">
+
+<h2 id="about"><font color="#b22222">■</font> About Us</h2>
+
+<pre role="img" aria-label="Synetic Labs logo" wrap>
+   ▒▒▓▓░░                          ░▒▒░                   ░▒▒░          ░▒▒░
+  ░▓███▓▒ ░░░    ░░░░░░     ░░░░ ░░▓██▓ ░░░  ░░░          ░██▓      ░░░ ▒██▓░░    ░░░░░
+ ░▒▓██▒░  ▓█▓▒░ ░▓████▒░░  ░▒██▓ ▓████▓░▓█▓░░▓█▓░░        ░██▓░░  ░▒▓█▓░▒████▓░ ░▒▓███▓░
+░▓████░   ░▒▓█▓░░▓██▒▒▓▓▒░▒▓█▒░░ ░░▓██▓░▓██░░████▓░       ░████▓░░▓███▓░░████▓░░▓███▓▒░
+ ░▒▓▒░░   ▒▓▓▒░░ ░▒░ ░░▒░ ░▒░░     ░░▒░ ░▒░░░░▒▓▒░░       ░░▒▓▒░░░░▒▓▒░ ░░▓▓▒░ ░░▓▓▒░
+          ▒▓▒░
+</pre>
+<p>We do research and development of computational systems, specializing in machine intelligence for embodied systems and autonomous control in advanced robotics and uncrewed vehicles. We build hardware and offer software development consulting services.</p>
+
+
+<h2 id="projects"><font color="#b22222">■</font> Open Source Projects</h2>
+
+<table border="1" cellpadding="6" cellspacing="0" width="100%">
+<tr bgcolor="gray"><th align="left">Project</th><th align="left">What it is</th></tr>
+
+<tr><td valign="top" nowrap><b>SkyFlow</b></td>
+<td>A fast quadrotor simulator in JAX, for training thousands of drones at once. Wind,
+command delay, ground contact and crashes are part of the world. A policy can fly through
+the real firmware, by way of cudaflight. Over a billion physics steps a second on one
+RTX 4090.<br>
+<small>→ <a href="https://github.com/Synetic-Labs/SkyFlow">source</a> ・ MIT</small></td></tr>
+
+<tr><td valign="top" nowrap><b>SkyFlow Dynamics</b></td>
+<td>Every force, torque and motor model for multirotors that we know of, written once as
+symbolic math with its source. Each is tested two ways: against physics that must hold, and
+against numbers from running the reference simulators themselves (RotorPy, Crazyflow,
+SkyDreamer, JSBSim). The JAX code is generated from the math, not written by hand. Its
+5-inch racer is fitted to public flight data from the University of Zurich's NeuroBEM and
+Agilicious quad.<br>
+<small>→ <a href="https://github.com/Synetic-Labs/SkyFlow-Dynamics">source</a> ・ MIT</small></td></tr>
+
+<tr><td valign="top" nowrap><b>cudaflight</b></td>
+<td>Real Betaflight firmware, thousands of instances on one GPU: one thread is one complete
+flight controller. Training sees the same PID loops, rates, filters, mixer and OSD that fly
+the real aircraft, and can start from a real quad's settings dump. The firmware itself is
+unchanged, and the fork follows Betaflight's releases.<br>
+<small>→ <a href="https://github.com/Synetic-Labs/cudaflight">source</a> ・ GPL-3.0</small></td></tr>
+
+<tr><td valign="top" nowrap><b>Analog Vision</b></td>
+<td>Analog NTSC video over an FM radio link, simulated from the signal up: what the camera
+on an analog FPV drone sends, and what the pilot's goggles show, at any signal strength.
+Nothing is painted on. Grain, sparklies, tearing and snow all come out of the chain.<br>
+<small>▶ <a href="https://synetic-labs.github.io/Analog-Vision/">try it in your browser</a>
+・ <a href="https://github.com/Synetic-Labs/Analog-Vision">source</a></small></td></tr>
+</table>
+
+<h2 id="updates"><font color="#b22222">■</font> Latest Updates</h2>
+
+<dl>
+<dt>2026.11.10 <font color="#b22222"><small>NEW</small></font></dt>
+<dd>This home page rebuilt as a <a href="https://zaffer.github.io/plain-site/">plain-site</a>.</dd>
+<dt>2026.10.26</dt>
+<dd>Analog Vision: the whole signal chain on the GPU, live in a web page.</dd>
+<dt>2026.10.05</dt>
+<dd>SkyFlow: a 5-inch racer, every value traced to one real quad, is now the default.</dd>
+<dt>2026.08.18</dt>
+<dd>cudaflight: rebased onto Betaflight 2026.6.1.</dd>
+<dt>2026.08.12</dt>
+<dd>SkyFlow Dynamics: the JAX backend, generated from the math and checked against the
+reference numbers.</dd>
+<dt>2026.06.17</dt>
+<dd>Racing team: a figure-eight gate run on film.</dd>
+</dl>
+
+<h2 id="racing"><font color="#b22222">■</font> Racing team</h2>
+
+<p>The Synetic Labs Autonomous Drone Racing Team. Competing at in-person races demonstrating our competitive research. Solving the ultimate sim-to-real challenge.</p>
+
+<p><small>▶ <a href="https://synetic.racing/">synetic.racing</a></small></p>
+
+<h2 id="contact"><font color="#b22222">■</font> Contact Links</h2>
+
+<!-- public email will appear here when available later. -->
+<table cellpadding="4" cellspacing="0" role="presentation">
+<tr><td valign="top">X</td><td><a href="https://x.com/synetic_labs">@synetic_labs</a></td></tr>
+<tr><td valign="top">GitHub</td><td><a href="https://github.com/Synetic-Labs">github.com/Synetic-Labs</a></td></tr>
+<tr><td valign="top">LinkedIn</td><td><a href="https://www.linkedin.com/company/synaptech-solutions-ltd">linkedin.com/company/synaptech-solutions-ltd</a></td></tr>
+</table>
+
+<hr noshade size="1">
+
+<p><small>© 2026 Synetic Labs ・ Last updated 2026-11-10 ・ ▲ <a href="#">top</a></small></p>
+
+</td><td></td></tr></table>
+
 </body>
 </html>
