@@ -7,6 +7,8 @@
 <title>Synetic Labs</title>
 <meta name="description" content="Synetic Labs - machine intelligence research and development">
 <link rel="canonical" href="https://synetic.dev/">
+<!-- One exception to zero CSS: a 2 KB cut of DejaVu Sans Mono (space + U+2580-259F) for the logo. Android's monospace font has no block characters and its fallback draws them wider than a space. -->
+<style>@font-face{font-family:logo;src:url(data:font/woff2;base64,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)}</style>
 </head>
 <body>
 
@@ -30,15 +32,18 @@
 
 <table align="center" cellpadding="0" cellspacing="0" role="img" aria-label="Synetic Labs logo"><tr><td>
 <table align="left" cellpadding="0" cellspacing="0" role="presentation"><tr><td><pre wrap>
+<font face="logo, monospace" size="2"> 
   ████                        ██              
   ██    ██    ████      ██  ████  ██  ██      
 ████      ██  ██  ██  ██      ██  ██  ████    
-        ██                                    
+        ██                                            
+</font>
 </pre></td></tr></table>
 <table align="left" cellpadding="0" cellspacing="0" role="presentation"><tr><td><pre wrap>
+<font face="logo, monospace" size="2">
 ██          ██
 ██      ██  ████    ████
-████  ████  ████  ████
+████  ████  ████  ████</font>
 </pre></td></tr></table>
 </td></tr></table>
 <p>We do research and development of computational systems, specializing in machine intelligence for embodied systems and autonomous control in advanced robotics and uncrewed vehicles. We build hardware and offer software development consulting services.</p>
